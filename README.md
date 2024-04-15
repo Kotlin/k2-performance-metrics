@@ -1,23 +1,29 @@
 # Description
 
-This projects allows you to run performance tests on your Gradle project to compare 
-performance difference between [Kotlin K1 and K2 compilers](https://blog.jetbrains.com/kotlin/2023/02/k2-kotlin-2-0/). 
+This project enables you to run performance tests on your Gradle project to compare the differences in
+performance between [Kotlin K1 and K2 compilers](https://blog.jetbrains.com/kotlin/2023/02/k2-kotlin-2-0/). 
 
-Performance tests will build your project with kotlin `2.0.0-RC1` and kotlin `1.9.23` releases by running `assmeble` task.
-The `assemble` task is used by default to build your project.
-Benchmarks will be run three scenarios: "clean build",
-"incremental build with non-ABI changes" and "incremental build with ABI changes".
-After benchmark will finish open [benchmarkResult.ipynb](benchmarkResult.ipynb) Kotlin notebook to compare Gradle
-and Kotlin time in the produced result.
+The `assemble` task, used by default, builds your project using Kotlin versions `2.0.0-RC1` and `1.9.23` for performance tests.
 
-## Getting Started
+Three test scenarios are covered to benchmark the performance:
+
+* clean build
+* incremental build with non-ABI changes
+* incremental build with ABI changes
+
+After the build finishes, open the [benchmarkResult.ipynb](benchmarkResult.ipynb) Kotlin Notebook to compare the results.
 
 ## Project requirements
 
-Project should allow changing the Kotlin version via `kotlin_version` Gradle property.
+Ensure that the [`JAVA_HOME`](https://docs.oracle.com/cd/E19182-01/821-0917/inst_jdk_javahome_t/index.html) environment variable is set.  
+If your project involves Android development, make sure to set the [`ANDROID_HOME`](https://developer.android.com/tools/variables) 
+environmental variable as well.
 
-If a project is using version catalog,
-you can update `settings.gradle.kts` files in it to override the kotlin version:
+You can change the Kotlin version of your project, by setting the `kotlin_version` Gradle property.
+
+If your project uses version catalog,
+you can update the `settings.gradle.kts` file to override the Kotlin version using the following code:
+
 ```kotlin
 versionCatalogs {
     create("libs") {
@@ -27,41 +33,39 @@ versionCatalogs {
         }
     }
 }
-
 ```
 
-## Tested project
+## Configure project settings
 
-There are two options to configure your project for performance tests:
-- set the path to your project via `project.path` in [gradle.properties](gradle.properties).
-- set `project.git.url` and `project.git.commit.sha` in [gradle.properties](gradle.properties) to clone a project from git repository. 
+You can modify your [gradle.properties](gradle.properties) file to configure your project for performance tests:
 
-In addition, you can specify directory where the project will be stored with `project.git.directory` property, 
-otherwise Git project name will be used.
+* Set `project.path` to configure the path to your project.
+* Set `project.git.url` and `project.git.commit.sha` to specify the URL and commit of a Git repository from which to clone your project.
+* Set `project.git.directory` to specify the directory where the project is stored.
 
-## Update build scenarios for your project  
+## Configure build scenarios 
 
-Additional scenarios configuration is required to run performance tests on your project. 
-Please set in [gradle.properties](gradle.properties) the following properties:
-- set list of files split by comma for incremental build with non-ABI changes in `scenario.non.abi.changes` property
-- set a single file path for incremental build with ABI change in `scenario.abi.changes` property
-- set the default task to build your project in `scenario.task` property, otherwise `assemble` task will be used.
+You can modify your [gradle.properties](gradle.properties) file to configure specific scenarios for your project:
 
-## Custom build scenarios
+* Set `scenario.non.abi.changes` to specify files for incremental builds with non-ABI changes. For multiple files, separate them with commas.
+* Set `scenario.abi.changes` to specify a single file path for incremental builds with ABI changes.
+* Set `scenario.task` to define the default build task; if not set, the `assemble` task will be used by default.
 
-If you are interested in running performance build on custom scenarios, you can configure them via 
-`PerformanceTask.scenarios` task input,
-or set [Gradle profiler](https://github.com/gradle/gradle-profiler) scenario file via `PerformanceTask.scenarioFile` task input.
+## Create custom build scenarios
 
-For example, you can do follow update in [build.gradle.kts](build.gradle.kts) file to use custom scenarios:
+You can define custom build scenarios for your project by specifying them in your [`build.gradle.kts`](build.gradle.kts) file.
+Set up your scenarios using the `PerformanceTask.scenarios` task input or configure a
+[Gradle profiler](https://github.com/gradle/gradle-profiler) scenario file using the `PerformanceTask.scenarioFile` task input.
+
+For example, you can add the following configuration to your [build.gradle.kts](build.gradle.kts) file to use custom scenarios:
 
 ```kotlin
-
 import org.jetbrains.kotlin.k2.blogpost.PerformanceTask
 
+// Defines custom scenarios
 val customScenarios = listOf(Scenario(
     name = "new scenario",
-    cleanTasks = listOf("clean_task_if_need"),
+    cleanTasks = listOf("clean_task_if_needed"),
     kotlinVersion = kotlinVersion,
     tasks = listOf("task_to_execute"),
     projectDir = project.projectDir,
@@ -70,6 +74,7 @@ val customScenarios = listOf(Scenario(
     executionRounds = 5,
 ))
 
+// Registers performance tasks for Kotlin versions 2.0.0-RC1 and 1.9.23
 val benchmark_2_0 = PerformanceTask.registerPerformanceTask(project, "benchmark_2_0", "2.0.0-RC1") {
     scenarios.set(customScenarios)
 }
@@ -78,36 +83,38 @@ val benchmark_1_9 = PerformanceTask.registerPerformanceTask(project, "benchmark_
     scenarios.set(customScenarios)
 }
 
+// Registers a task to run all benchmarks
 tasks.register("runBenchmarks") {
     dependsOn(benchmark_2_0, benchmark_1_9)
 }
-
 ```
 
 ## Run performance test
-Please set up `JAVA_HOME` and `ANDROID_HOME`(if need) variables before run tests
 
-Execute 
+To run performance tests, run the following command in your terminal:
+
 ```bash
 ./gradlew runBenchmarks
 ```
 
-## Visualise results
+## Visualize results
 
-To analyse benchmark results,
-you need to have installed [Kotlin notebook](https://blog.jetbrains.com/kotlin/2023/07/introducing-kotlin-notebook/) 
-plugin in IntelliJ IDEA.
+> You must have the [Kotlin Notebook](https://blog.jetbrains.com/kotlin/2023/07/introducing-kotlin-notebook/) plugin 
+> installed in IntelliJ IDEA Ultimate to view the results.
 
-Please open [benchmarkResult.ipynb](benchmarkResult.ipynb) and run it with `Run All` action to compare produced results. 
+To analyze the results:
+
+1. Open the [benchmarkResult.ipynb](benchmarkResult.ipynb) Kotlin Notebook file.
+2. Run all code cells in the Kotlin Notebook using the `Run All` button to display and compare the produced results. 
 
 ## Troubleshooting
 
-It is possible that a new warning appears in the build with kotlin `2.0.0`. 
-Please either fix them or disable `allWarningsAsErrors` compiler option if you use it.
+You might encounter new warnings in your builds using Kotlin `2.0.0`. 
+You can either resolve these warnings or disable the `allWarningsAsErrors` compiler option to continue without fixing them.
 
 If  [dependencies verification](https://docs.gradle.org/8.2.1/userguide/dependency_verification.html#sub:enabling-verification) is enabled,
-please check that both kotlin `1.9` and kotlin `2.0` dependencies are included.
+ensure that the dependencies for both Kotlin `1.9` and Kotlin `2.0` are correctly included in your project setup.
 
-The `JSON` build report output type is available since kotlin `2.0.0-RC1` and kotlin `1.9.23`. 
-If a `kotlinDsl` plugin is applied in the `buildSrc` subproject,
-we recommend to also apply `kotlin(“jvm”)` plugin to avoid any issues with unknown output type.
+The JSON build report output type is available since Kotlin `2.0.0-RC1` and Kotlin `1.9.23`. 
+If you are using the `kotlinDsl` plugin in the `buildSrc` subproject, we recommend applying the `kotlin("jvm")` plugin as well. 
+This prevents issues related to unrecognized output types and ensures compatibility across your project's configuration.
