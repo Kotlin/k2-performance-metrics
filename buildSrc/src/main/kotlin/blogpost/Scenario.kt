@@ -34,11 +34,11 @@ data class Scenario(
     fun printScenario(writer: BufferedWriter) {
         writer.append("$name {\n")
         cleanTasks?.let { tasks ->
-            tasks.joinToString(
+            writer.append(tasks.joinToString(
                 separator = ", ",
                 prefix = "cleanup-tasks = [",
                 postfix = "]\n",
-                transform = { "\"$it\"" })
+                transform = { "\"$it\"" }))
         }
         writer.append(
                 tasks.joinToString(
