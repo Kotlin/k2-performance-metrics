@@ -19,9 +19,9 @@ data class Scenario(
     @get:InputDirectory
     val projectDir: File,
     @get:Input
-    val warmUpRounds: Int = 10,
+    val warmUpRounds: Int = 5,
     @get:Input
-    val executionRounds: Int = 10,
+    val executionRounds: Int = 5,
     @get:Input
     val additionGradleArguments: List<String> = emptyList(),
     @get:Input
