@@ -2,10 +2,6 @@ package org.jetbrains.kotlin.k2.blogpost
 
 import org.gradle.api.DefaultTask
 import java.io.File
-import java.io.IOException
-import java.util.zip.ZipInputStream
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.file.ProjectLayout
@@ -72,18 +68,18 @@ abstract class PerformanceTask @Inject constructor(
     @get:InputFile
     abstract val scenarioFile: RegularFileProperty
 
-    @get:OutputDirectory
+    @get:InputDirectory
     val gradleProfilerDir: Provider<Directory> = projectLayout.buildDirectory.dir("gradle-profiler")
 
     private val gradleProfilerBin: Provider<RegularFile> = gradleProfilerDir.map {
-            it.dir("bin")
-                .run {
-                    if (System.getProperty("os.name").contains("windows", ignoreCase = true)) {
-                        file("gradle-profiler.bat")
-                    } else {
-                        file("gradle-profiler")
-                    }
+        it.dir("bin")
+            .run {
+                if (System.getProperty("os.name").contains("windows", ignoreCase = true)) {
+                    file("gradle-profiler.bat")
+                } else {
+                    file("gradle-profiler")
                 }
+            }
     }
 
     private val generatedScenarioFile: Provider<RegularFile> = projectLayout
@@ -96,7 +92,6 @@ abstract class PerformanceTask @Inject constructor(
 
     @TaskAction
     fun run() {
-        downloadGradleProfilerIfNotAvailable(gradleProfilerDir.get().asFile)
         val scenario = createScenariosIfNeed()
         testProject.get().checkoutProjectFromGit(logger)
         runBenchmark(scenario)
@@ -116,12 +111,6 @@ abstract class PerformanceTask @Inject constructor(
     }
 
     companion object {
-        private const val GRADLE_PROFILER_VERSION = "0.19.0"
-        private const val GRADLE_PROFILER_URL: String =
-            "https://repo1.maven.org/maven2/org/gradle/profiler/gradle-profiler/$GRADLE_PROFILER_VERSION/gradle-profiler-$GRADLE_PROFILER_VERSION.zip"
-
-        private val String.dropLeadingDir: String get() = substringAfter('/')
-
         @JvmStatic
         fun registerPerformanceTask(
             project: Project,
@@ -136,55 +125,6 @@ abstract class PerformanceTask @Inject constructor(
                 configure(this)
             }
         }
-    }
-
-    private fun downloadGradleProfilerIfNotAvailable(gradleProfilerDir: File) {
-        if (gradleProfilerDir.listFiles().isNullOrEmpty()) {
-            downloadAndExtractGradleProfiler(gradleProfilerDir)
-        } else {
-            logger.info("Gradle profiler has been already downloaded")
-        }
-    }
-
-    private fun downloadAndExtractGradleProfiler(gradleProfilerDir: File) {
-        logger.info("Downloading gradle-profiler into ${gradleProfilerDir.absolutePath}")
-
-        gradleProfilerDir.mkdirs()
-
-        val okHttpClient = OkHttpClient()
-        val request = Request.Builder()
-            .get()
-            .url(GRADLE_PROFILER_URL)
-            .build()
-        val response = okHttpClient.newCall(request).execute()
-        if (!response.isSuccessful) {
-            throw IOException("Failed to download gradle-profiler, error code: ${response.code}")
-        }
-
-        val contentLength = response.body!!.contentLength()
-        var downloadedLength = 0L
-        logger.debug("Downloading: ")
-        response.body!!.byteStream().buffered().use { responseContent ->
-            ZipInputStream(responseContent).use { zip ->
-                var zipEntry = zip.nextEntry
-                while (zipEntry != null) {
-                    if (zipEntry.isDirectory) {
-                        gradleProfilerDir.resolve(zipEntry.name.dropLeadingDir).also { it.mkdirs() }
-                    } else {
-                        gradleProfilerDir.resolve(zipEntry.name.dropLeadingDir).outputStream().buffered().use {
-                            zip.copyTo(it)
-                        }
-                    }
-                    downloadedLength += zipEntry.compressedSize
-                    logger.debug("..{}%", downloadedLength * 100 / contentLength)
-                    zip.closeEntry()
-                    zipEntry = zip.nextEntry
-                }
-            }
-            logger.debug("\n")
-        }
-        gradleProfilerBin.get().asFile.setExecutable(true)
-        logger.info("Finished downloading gradle-profiler")
     }
 
     private fun runBenchmark(scenarioFile: File) {
