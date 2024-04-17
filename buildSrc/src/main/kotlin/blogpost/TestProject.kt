@@ -29,7 +29,7 @@ class TestProject(
     fun checkoutProjectFromGit(logger: Logger) {
         if (projectGitUrl == null) return
 
-        require(gitCommitSha == null) { "Git commit SHA is required" }
+        require(gitCommitSha != null) { "Git commit SHA is required" }
 
         logger.info("Git project will be checked out into \'${projectDir.path}\'")
         val git = if (projectDir.exists()) {
