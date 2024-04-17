@@ -132,6 +132,9 @@ abstract class PerformanceTask @Inject constructor(
         val workDirectory = projectLayout.buildDirectory.dir("benchmarkRuns").get().asFile.also {
             it.mkdirs()
         }
+        //files in output directory will be overriden by gradle profile
+        val gradleProfilerOutputDir = "${testProject.get().projectDir.name}-${kotlinVersion.get()}-profile-out".replace(".", "-")
+
         val profilerProcessBuilder = ProcessBuilder()
             .directory(workDirectory)
             .inheritIO()
@@ -140,19 +143,22 @@ abstract class PerformanceTask @Inject constructor(
                 "--benchmark",
                 "--project-dir",
                 testProject.get().projectDir.absolutePath,
+                "--output-dir",
+                gradleProfilerOutputDir,
                 "--scenario-file",
                 scenarioFile.absolutePath,
-            ).also {
+
+                )
+            .also {
                 // Required, so 'gradle-profiler' will use toolchain JDK instead of current user one
                 it.environment()["JAVA_HOME"] = System.getProperty("java.home")
                 it.environment()["kotlin_version"] = kotlinVersion.get()
             }
 
-        runBenchmarksForKotlinVersion(profilerProcessBuilder)
-        logger.info("Benchmarks successful finished")
+        runBenchmarksForKotlinVersion(profilerProcessBuilder, workDirectory.resolve(gradleProfilerOutputDir))
     }
 
-    private fun runBenchmarksForKotlinVersion(profilerProcessBuilder: ProcessBuilder) {
+    private fun runBenchmarksForKotlinVersion(profilerProcessBuilder: ProcessBuilder, gradleProfilerOutputDir: File) {
         val profilerProcess = profilerProcessBuilder.start()
         // Stop profiler on script stop
         Runtime.getRuntime().addShutdownHook(Thread {
@@ -160,8 +166,12 @@ abstract class PerformanceTask @Inject constructor(
         })
         profilerProcess.waitFor()
 
+        val logFile = gradleProfilerOutputDir.resolve("profile.log")
+        val logInfo = "Check the log file at file://${logFile.absolutePath} for more details"
         if (profilerProcess.exitValue() != 0) {
-            throw IllegalStateException("Benchmarks end with non zero code: ${profilerProcess.exitValue()}. Please look into benchmark log for more details")
+            logger.error("Benchmarks finished with non-zero exit code: ${profilerProcess.exitValue()}. $logInfo")
+        } else {
+            logger.lifecycle("Benchmarks finished successfully. $logInfo")
         }
     }
 }
