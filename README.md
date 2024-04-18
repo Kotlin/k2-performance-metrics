@@ -12,6 +12,8 @@ Three test scenarios are covered to benchmark the performance:
 * incremental build with ABI changes
 
 After the build finishes, open the [benchmarkResult.ipynb](benchmarkResult.ipynb) Kotlin Notebook to compare the results.
+> You must have the [Kotlin Notebook](https://blog.jetbrains.com/kotlin/2023/07/introducing-kotlin-notebook/) plugin 
+> installed in IntelliJ IDEA Ultimate to view the results.
 
 ## Project requirements
 
