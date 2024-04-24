@@ -21,7 +21,7 @@ abstract class DownloadGradleProfileTask @Inject constructor(
 ) : DefaultTask() {
 
     @get:OutputDirectory
-    val gradleProfilerDir: Provider<Directory> = projectLayout.buildDirectory.dir("gradle-profiler")
+    val gradleProfilerDir: Provider<Directory> = projectLayout.buildDirectory.dir("gradle-profiler-$GRADLE_PROFILER_VERSION")
 
     private val gradleProfilerBin: Provider<RegularFile> = gradleProfilerDir.map {
         it.dir("bin")
@@ -35,7 +35,7 @@ abstract class DownloadGradleProfileTask @Inject constructor(
     }
 
     companion object {
-        private const val GRADLE_PROFILER_VERSION = "0.19.0"
+        private const val GRADLE_PROFILER_VERSION = "0.21.0-alpha-4"
         private const val GRADLE_PROFILER_URL: String =
             "https://repo1.maven.org/maven2/org/gradle/profiler/gradle-profiler/$GRADLE_PROFILER_VERSION/gradle-profiler-$GRADLE_PROFILER_VERSION.zip"
 
