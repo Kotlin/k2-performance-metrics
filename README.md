@@ -17,6 +17,14 @@ After the build finishes, open the [benchmarkResult.ipynb](benchmarkResult.ipynb
 
 ## Project requirements
 
+Ensure beforehand that the used project is compiled with both kotlin 1.9.23 and kotlin 2.0.0. 
+You might also encounter new warnings in your builds using Kotlin `2.0.0`.
+You can either resolve these warnings or disable the `allWarningsAsErrors` compiler option to continue without fixing them.
+
+The JSON build report output type is available since Kotlin `2.0.0-RC1` and Kotlin `1.9.23`.
+If you are using the `kotlinDsl` plugin in the `buildSrc` subproject, we recommend applying the `kotlin("jvm")` plugin as well.
+This prevents issues related to unrecognized output types and ensures compatibility across your project's configuration.
+
 Ensure that the [`JAVA_HOME`](https://docs.oracle.com/cd/E19182-01/821-0917/inst_jdk_javahome_t/index.html) environment variable is set.  
 If your project involves Android development, make sure to set the [`ANDROID_HOME`](https://developer.android.com/tools/variables) 
 environmental variable as well.
@@ -36,6 +44,9 @@ versionCatalogs {
     }
 }
 ```
+
+If  [dependencies verification](https://docs.gradle.org/8.2.1/userguide/dependency_verification.html#sub:enabling-verification) is enabled,
+ensure that the dependencies for both Kotlin `1.9` and Kotlin `2.0` are correctly included in your project setup.
 
 ## Configure project settings
 
@@ -109,14 +120,3 @@ To analyze the results:
 1. Open the [benchmarkResult.ipynb](benchmarkResult.ipynb) Kotlin Notebook file.
 2. Run all code cells in the Kotlin Notebook using the `Run All` button to display and compare the produced results. 
 
-## Troubleshooting
-
-You might encounter new warnings in your builds using Kotlin `2.0.0`. 
-You can either resolve these warnings or disable the `allWarningsAsErrors` compiler option to continue without fixing them.
-
-If  [dependencies verification](https://docs.gradle.org/8.2.1/userguide/dependency_verification.html#sub:enabling-verification) is enabled,
-ensure that the dependencies for both Kotlin `1.9` and Kotlin `2.0` are correctly included in your project setup.
-
-The JSON build report output type is available since Kotlin `2.0.0-RC1` and Kotlin `1.9.23`. 
-If you are using the `kotlinDsl` plugin in the `buildSrc` subproject, we recommend applying the `kotlin("jvm")` plugin as well. 
-This prevents issues related to unrecognized output types and ensures compatibility across your project's configuration.
