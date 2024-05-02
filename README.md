@@ -50,7 +50,7 @@ ensure that the dependencies for both Kotlin `1.9` and Kotlin `2.0` are correctl
 
 ## Configure project settings
 
-You can modify your [gradle.properties](gradle.properties) file to configure your project for performance tests:
+You should modify your [gradle.properties](gradle.properties) file to configure your project for performance tests:
 
 * Set `project.path` to configure the path to your project.
 * Set `project.git.url` and `project.git.commit.sha` to specify the URL and commit of a Git repository from which to clone your project.
@@ -58,7 +58,7 @@ You can modify your [gradle.properties](gradle.properties) file to configure you
 
 ## Configure build scenarios 
 
-You can modify your [gradle.properties](gradle.properties) file to configure specific scenarios for your project:
+You should modify your [gradle.properties](gradle.properties) file to configure default scenarios for your project:
 
 * Set `scenario.non.abi.changes` to specify files for incremental builds with non-ABI changes. For multiple files, separate them with commas.
 * Set `scenario.abi.changes` to specify a single file path for incremental builds with ABI changes.
