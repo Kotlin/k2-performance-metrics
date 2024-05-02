@@ -44,14 +44,18 @@ abstract class PerformanceTask @Inject constructor(
                     "incremental_non_abi_build",
                     tasks = listOf(gradleTask),
                     projectDir = project.projectDir,
-                    nonAbiChanges = project.providers.gradleProperty("scenario.non.abi.changes").orNull?.split(","),
+                    nonAbiChanges = project.providers.gradleProperty("scenario.non.abi.changes").orNull?.split(",") ?: throw IllegalArgumentException(
+                        createErrorMessageForMissedProperty(propertyName = "scenario.non.abi.changes", scenarioName = "incremental_non_abi_build")
+                    ),
                     kotlinVersion = kotlinVersion
                 ),
                 Scenario(
                     "incremental_abi_build",
                     tasks = listOf(gradleTask),
                     projectDir = project.projectDir,
-                    abiChanges = project.providers.gradleProperty("scenario.abi.changes").orNull,
+                    abiChanges = project.providers.gradleProperty("scenario.abi.changes").orNull ?: throw IllegalArgumentException(
+                        createErrorMessageForMissedProperty(propertyName = "scenario.abi.changes", scenarioName = "incremental_abi_build")
+                    ),
                     kotlinVersion = kotlinVersion
                 ),
             )
@@ -125,6 +129,10 @@ abstract class PerformanceTask @Inject constructor(
                 configure(this)
             }
         }
+
+        private fun createErrorMessageForMissedProperty(propertyName: String, scenarioName: String) =
+            "Unable to create \'$scenarioName\' scenario for performance test.\n" +
+                    "Please provide path to a project file with \'$propertyName\' property."
     }
 
     private fun runBenchmark(scenarioFile: File) {
@@ -133,7 +141,8 @@ abstract class PerformanceTask @Inject constructor(
             it.mkdirs()
         }
         //files in output directory will be overriden by gradle profile
-        val gradleProfilerOutputDir = "${testProject.get().projectDir.name}-${kotlinVersion.get()}-profile-out".replace(".", "-")
+        val gradleProfilerOutputDir =
+            "${testProject.get().projectDir.name}-${kotlinVersion.get()}-profile-out".replace(".", "-")
 
         val profilerProcessBuilder = ProcessBuilder()
             .directory(workDirectory)
