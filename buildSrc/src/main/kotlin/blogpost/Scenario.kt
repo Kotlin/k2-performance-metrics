@@ -2,6 +2,7 @@ package org.jetbrains.kotlin.k2.blogpost
 
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import java.io.BufferedWriter
 import java.io.File
@@ -27,6 +28,10 @@ data class Scenario(
     @get:Input
     @get:Optional
     val abiChanges: String? = null,
+    @get:Nested
+    @get:Input
+    @get:Optional
+    val gitCheckout: GitCheckout? = null,
     @get:Input
     @get:Optional
     val nonAbiChanges: List<String>? = null,
@@ -60,6 +65,9 @@ data class Scenario(
                 postfix = "]\n",
                 transform = { "\"$it\"" }))
         }
+        gitCheckout?.let { (cleanup, build) ->
+            writer.append("git-checkout = {\ncleanup = \"$cleanup\"\nbuild = \"$build\"\n}\n")
+        }
 
         writer.append("gradle-args = [\"--no-build-cache\", \"-Pkotlin.build.report.output=JSON,FILE\", " +
                 "\"-Pkotlin.build.report.json.directory=${escapeSymbolsForWindows(projectDir.resolve("reports/$kotlinVersion/$name").path)}\", " +
@@ -72,4 +80,12 @@ data class Scenario(
     }
 
     private fun escapeSymbolsForWindows(path: String) = path.replace("\\", "\\\\")
+
 }
+
+data class GitCheckout(
+    @get:Input
+    val cleanup: String,
+    @get:Input
+    val build: String,
+)
