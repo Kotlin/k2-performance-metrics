@@ -80,7 +80,6 @@ data class Scenario(
     }
 
     private fun escapeSymbolsForWindows(path: String) = path.replace("\\", "\\\\")
-
 }
 
 data class GitCheckout(
