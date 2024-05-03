@@ -146,7 +146,6 @@ abstract class PerformanceTask @Inject constructor(
 
         val profilerProcessBuilder = ProcessBuilder()
             .directory(workDirectory)
-            .inheritIO()
             .command(
                 gradleProfilerBin.get().asFile.absolutePath,
                 "--benchmark",
@@ -156,7 +155,6 @@ abstract class PerformanceTask @Inject constructor(
                 gradleProfilerOutputDir,
                 "--scenario-file",
                 scenarioFile.absolutePath,
-
                 )
             .also {
                 // Required, so 'gradle-profiler' will use toolchain JDK instead of current user one
@@ -168,19 +166,23 @@ abstract class PerformanceTask @Inject constructor(
     }
 
     private fun runBenchmarksForKotlinVersion(profilerProcessBuilder: ProcessBuilder, gradleProfilerOutputDir: File) {
+        val logFile = gradleProfilerOutputDir.resolve("profile.log")
+        logger.lifecycle("Benchmarks log will be written at file://${logFile.absolutePath}")
+
         val profilerProcess = profilerProcessBuilder.start()
         // Stop profiler on script stop
         Runtime.getRuntime().addShutdownHook(Thread {
             profilerProcess.destroy()
         })
+
         profilerProcess.waitFor()
 
-        val logFile = gradleProfilerOutputDir.resolve("profile.log")
-        val logInfo = "Check the log file at file://${logFile.absolutePath} for more details"
+        logger.error(profilerProcess.errorStream.bufferedReader().readText())
+
         if (profilerProcess.exitValue() != 0) {
-            logger.error("Benchmarks finished with non-zero exit code: ${profilerProcess.exitValue()}. $logInfo")
+            throw IllegalStateException("Benchmarks finished with non-zero exit code: ${profilerProcess.exitValue()}")
         } else {
-            logger.lifecycle("Benchmarks finished successfully. $logInfo")
+            logger.lifecycle("Benchmarks finished successfully.")
         }
     }
 }
