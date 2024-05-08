@@ -29,7 +29,6 @@ data class Scenario(
     @get:Optional
     val abiChanges: String? = null,
     @get:Nested
-    @get:Input
     @get:Optional
     val gitCheckout: GitCheckout? = null,
     @get:Input
