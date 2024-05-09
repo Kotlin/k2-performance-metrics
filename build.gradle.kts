@@ -9,9 +9,10 @@ plugins {
 val downloadGradleProfileTask = DownloadGradleProfileTask.registerTask(project)
 
 val cleanGeneratedReports_2_0 = tasks.register<Delete>("cleanGeneratedReports2_0") {
-    delete(layout.projectDirectory.dir("reports/2.0.0-RC1"))
+    delete(layout.projectDirectory.dir("reports/2.0.0-RC2"))
 }
-val benchmark_2_0 = PerformanceTask.registerPerformanceTask(project, "benchmark_2_0", "2.0.0-RC1") {
+
+val benchmark_2_0 = PerformanceTask.registerPerformanceTask(project, "benchmark_2_0", "2.0.0-RC2") {
     dependsOn(cleanGeneratedReports_2_0)
     dependsOn(downloadGradleProfileTask)
 }
