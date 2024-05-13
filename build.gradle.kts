@@ -6,6 +6,10 @@ plugins {
     `kotlin-dsl`
 }
 
+repositories {
+    mavenCentral()
+}
+
 val downloadGradleProfileTask = DownloadGradleProfileTask.registerTask(project)
 
 val cleanGeneratedReports_2_0 = tasks.register<Delete>("cleanGeneratedReports2_0") {
