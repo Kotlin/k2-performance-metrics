@@ -52,6 +52,7 @@ data class Scenario(
                     transform = { "\"$it\"" })
             )
         writer.append("warm-ups = $warmUpRounds\n")
+        writer.append("iterations = $executionRounds\n")
         writer.append("clear-build-cache-before = SCENARIO\n")
         writer.append("clear-transform-cache-before = SCENARIO\n")
         abiChanges?.let {
