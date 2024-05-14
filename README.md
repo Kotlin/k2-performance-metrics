@@ -18,7 +18,7 @@ After the build finishes, open the [benchmarkResult.ipynb](benchmarkResult.ipynb
 ## Prerequisites
 
 Ensure beforehand that the project that you want to analyze can be successfully compiled with both Kotlin versions that you want to compare.
-By default, this project uses Kotlin 1.9.23 and Kotlin 2.0.0-RC3.
+By default, this project uses Kotlin 1.9.24 and Kotlin 2.0.0-RC3.
 
 So that the Kotlin version can be automatically configured for your project, in your `build.gradle(.kts)` file, add the `$kotlin_version` parameter:
 
@@ -95,12 +95,12 @@ val customScenarios = listOf(Scenario(
     executionRounds = 5,
 ))
 
-// Registers performance tasks for Kotlin versions 2.0.0-RC3 and 1.9.23
+// Registers performance tasks for Kotlin versions 2.0.0-RC3 and 1.9.24
 val benchmark_2_0 = PerformanceTask.registerPerformanceTask(project, "benchmark_2_0", "2.0.0-RC3") {
     scenarios.set(customScenarios)
 }
 
-val benchmark_1_9 = PerformanceTask.registerPerformanceTask(project, "benchmark_1_9", "1.9.23") {
+val benchmark_1_9 = PerformanceTask.registerPerformanceTask(project, "benchmark_1_9", "1.9.24") {
     scenarios.set(customScenarios)
 }
 

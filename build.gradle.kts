@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.k2.blogpost.DownloadGradleProfileTask
 import org.jetbrains.kotlin.k2.blogpost.PerformanceTask
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.9.23"
+    id("org.jetbrains.kotlin.jvm") version "1.9.24"
     `kotlin-dsl`
 }
 
@@ -23,9 +23,10 @@ val benchmark_2_0 = PerformanceTask.registerPerformanceTask(project, "benchmark_
 }
 
 val cleanGeneratedReports_1_9 = tasks.register<Delete>("cleanGeneratedReports1_9") {
-    delete(layout.projectDirectory.dir("reports/1.9.23"))
+    delete(layout.projectDirectory.dir("reports/1.9.24"))
 }
-val benchmark_1_9 = PerformanceTask.registerPerformanceTask(project, "benchmark_1_9", "1.9.23") {
+
+val benchmark_1_9 = PerformanceTask.registerPerformanceTask(project, "benchmark_1_9", "1.9.24") {
     gradleProfilerDir.set(downloadGradleProfileTask.flatMap { it.gradleProfilerDir })
     dependsOn(cleanGeneratedReports_1_9)
     dependsOn(downloadGradleProfileTask)
