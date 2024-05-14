@@ -3,7 +3,7 @@ package org.jetbrains.kotlin.k2.blogpost
 import org.gradle.api.DefaultTask
 import java.io.File
 import org.gradle.api.Project
-import org.gradle.api.file.Directory
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
@@ -73,7 +73,7 @@ abstract class PerformanceTask @Inject constructor(
     abstract val scenarioFile: RegularFileProperty
 
     @get:InputDirectory
-    val gradleProfilerDir: Provider<Directory> = projectLayout.buildDirectory.dir("gradle-profiler")
+    abstract val gradleProfilerDir: DirectoryProperty
 
     private val gradleProfilerBin: Provider<RegularFile> = gradleProfilerDir.map {
         it.dir("bin")
