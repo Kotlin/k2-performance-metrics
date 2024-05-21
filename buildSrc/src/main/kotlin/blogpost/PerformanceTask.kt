@@ -17,6 +17,7 @@ import org.gradle.kotlin.dsl.listProperty
 import org.gradle.kotlin.dsl.property
 import org.gradle.kotlin.dsl.register
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 abstract class PerformanceTask @Inject constructor(
     providerFactory: ProviderFactory,
@@ -169,15 +170,24 @@ abstract class PerformanceTask @Inject constructor(
         val logFile = gradleProfilerOutputDir.resolve("profile.log")
         logger.lifecycle("Benchmarks log will be written at file://${logFile.absolutePath}")
 
+        // Gradle benchmark tool prints both to file and to stdout.
+        // Discarding (or redirecting to any file) standart output also fixes "hanging" on Windows hosts
+        profilerProcessBuilder.redirectOutput(ProcessBuilder.Redirect.DISCARD)
+
         val profilerProcess = profilerProcessBuilder.start()
         // Stop profiler on script stop
         Runtime.getRuntime().addShutdownHook(Thread {
             profilerProcess.destroy()
         })
 
-        profilerProcess.waitFor()
+        // stderr reader
+        val stdErrPrinter = thread {
+            val reader = profilerProcess.errorStream.bufferedReader()
+            reader.lines().forEach { logger.error(it) }
+        }
 
-        logger.error(profilerProcess.errorStream.bufferedReader().readText())
+        profilerProcess.waitFor()
+        stdErrPrinter.join() // wait for stderr printer to finish printing errors
 
         if (profilerProcess.exitValue() != 0) {
             throw IllegalStateException("Benchmarks finished with non-zero exit code: ${profilerProcess.exitValue()}")
