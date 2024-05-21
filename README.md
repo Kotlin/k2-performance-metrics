@@ -1,3 +1,5 @@
+[![JetBrains incubator project](https://jb.gg/badges/incubator-flat-square.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
+
 ## Introduction
 
 Use this project to run performance tests on your Gradle project and compare the differences in
