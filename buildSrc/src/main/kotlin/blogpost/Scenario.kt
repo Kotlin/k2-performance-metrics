@@ -26,6 +26,8 @@ data class Scenario(
     @get:Input
     val additionGradleArguments: List<String> = emptyList(),
     @get:Input
+    val runUsing: String,
+    @get:Input
     @get:Optional
     val abiChanges: String? = null,
     @get:Nested
@@ -69,7 +71,9 @@ data class Scenario(
             writer.append("git-checkout = {\ncleanup = \"$cleanup\"\nbuild = \"$build\"\n}\n")
         }
 
-        writer.append("gradle-args = [\"--no-build-cache\", \"-Pkotlin.build.report.output=JSON,FILE\", " +
+        writer.append("run-using = $runUsing\n")
+
+        writer.append("gradle-args = [\"--no-build-cache\", \"-Pkotlin.build.report.output=JSON,FILE\", \"-Pkotlin.daemon.jvmargs=-Xmx=4G\", " +
                 "\"-Pkotlin.build.report.json.directory=${escapeSymbolsForWindows(projectDir.resolve("reports/$kotlinVersion/$name").path)}\", " +
                 "\"-Pkotlin.build.report.file.output_dir=${escapeSymbolsForWindows(projectDir.resolve("reports/$kotlinVersion/$name").path)}\", " +
                 "\"-Pkotlin_version=$kotlinVersion\"")
