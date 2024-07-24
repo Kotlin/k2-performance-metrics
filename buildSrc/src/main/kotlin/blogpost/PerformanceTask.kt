@@ -33,31 +33,43 @@ abstract class PerformanceTask @Inject constructor(
     @Nested
     val scenarios: ListProperty<Scenario> = objectFactory.listProperty<Scenario>().value(
         gradleTask.zip(kotlinVersion) { gradleTask, kotlinVersion ->
+            val runUsing = project.providers.gradleProperty("scenario.run.using").orNull ?: "cli"
             listOf(
                 Scenario(
                     "clean_build",
                     cleanTasks = listOf("clean"),
                     tasks = listOf(gradleTask),
                     projectDir = project.projectDir,
-                    kotlinVersion = kotlinVersion
+                    kotlinVersion = kotlinVersion,
+                    runUsing = runUsing,
                 ),
                 Scenario(
                     "incremental_non_abi_build",
                     tasks = listOf(gradleTask),
                     projectDir = project.projectDir,
-                    nonAbiChanges = project.providers.gradleProperty("scenario.non.abi.changes").orNull?.split(",") ?: throw IllegalArgumentException(
-                        createErrorMessageForMissedProperty(propertyName = "scenario.non.abi.changes", scenarioName = "incremental_non_abi_build")
-                    ),
-                    kotlinVersion = kotlinVersion
+                    nonAbiChanges = project.providers.gradleProperty("scenario.non.abi.changes").orNull?.split(",")
+                        ?: throw IllegalArgumentException(
+                            createErrorMessageForMissedProperty(
+                                propertyName = "scenario.non.abi.changes",
+                                scenarioName = "incremental_non_abi_build"
+                            )
+                        ),
+                    kotlinVersion = kotlinVersion,
+                    runUsing = runUsing,
                 ),
                 Scenario(
                     "incremental_abi_build",
                     tasks = listOf(gradleTask),
                     projectDir = project.projectDir,
-                    abiChanges = project.providers.gradleProperty("scenario.abi.changes").orNull ?: throw IllegalArgumentException(
-                        createErrorMessageForMissedProperty(propertyName = "scenario.abi.changes", scenarioName = "incremental_abi_build")
-                    ),
-                    kotlinVersion = kotlinVersion
+                    abiChanges = project.providers.gradleProperty("scenario.abi.changes").orNull
+                        ?: throw IllegalArgumentException(
+                            createErrorMessageForMissedProperty(
+                                propertyName = "scenario.abi.changes",
+                                scenarioName = "incremental_abi_build"
+                            )
+                        ),
+                    kotlinVersion = kotlinVersion,
+                    runUsing = runUsing,
                 ),
             )
         }
@@ -156,10 +168,10 @@ abstract class PerformanceTask @Inject constructor(
                 gradleProfilerOutputDir,
                 "--scenario-file",
                 scenarioFile.absolutePath,
-                )
+            )
             .also {
                 // Required, so 'gradle-profiler' will use toolchain JDK instead of current user one
-                it.environment()["JAVA_HOME"] = System.getProperty("java.home")
+                it.environment()["JAVA_HOME"] = "/opt/homebrew/Cellar/openjdk/21.0.2/libexec/openjdk.jdk/Contents/Home"
                 it.environment()["kotlin_version"] = kotlinVersion.get()
             }
 
