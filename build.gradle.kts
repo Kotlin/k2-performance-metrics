@@ -13,10 +13,10 @@ repositories {
 val downloadGradleProfileTask = DownloadGradleProfileTask.registerTask(project)
 
 val cleanGeneratedReports_2_0 = tasks.register<Delete>("cleanGeneratedReports2_0") {
-    delete(layout.projectDirectory.dir("reports/2.0.0-RC3"))
+    delete(layout.projectDirectory.dir("reports/2.0.0"))
 }
 
-val benchmark_2_0 = PerformanceTask.registerPerformanceTask(project, "benchmark_2_0", "2.0.0-RC3") {
+val benchmark_2_0 = PerformanceTask.registerPerformanceTask(project, "benchmark_2_0", "2.0.0") {
     gradleProfilerDir.set(downloadGradleProfileTask.flatMap { it.gradleProfilerDir })
     dependsOn(cleanGeneratedReports_2_0)
     dependsOn(downloadGradleProfileTask)
