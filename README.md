@@ -75,6 +75,8 @@ To configure default scenarios for your project, modify your [gradle.properties]
 * Set `scenario.abi.changes` to specify a single file path for incremental builds with ABI changes.
 * Set `scenario.task` to define the default build task; if not set, the `assemble` task will be used by default.
 
+Gradle profiler allows you to run scenarios with `cli` or `tooling-api`. 
+Set `scenario.run.using` to specify a way to run scenarios or default `cli` option will be used.   
 ### Create custom build scenarios
 
 You can define custom build scenarios for your project by specifying them in your [`build.gradle.kts`](build.gradle.kts) file.

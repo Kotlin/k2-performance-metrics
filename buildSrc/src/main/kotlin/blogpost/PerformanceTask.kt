@@ -171,7 +171,7 @@ abstract class PerformanceTask @Inject constructor(
             )
             .also {
                 // Required, so 'gradle-profiler' will use toolchain JDK instead of current user one
-                it.environment()["JAVA_HOME"] = "/opt/homebrew/Cellar/openjdk/21.0.2/libexec/openjdk.jdk/Contents/Home"
+                it.environment()["JAVA_HOME"] = System.getProperty("java.home")
                 it.environment()["kotlin_version"] = kotlinVersion.get()
             }
 
