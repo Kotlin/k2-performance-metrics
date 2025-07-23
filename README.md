@@ -125,10 +125,6 @@ To run performance tests, run the following command in your terminal:
 
 ## Step 4: (Optional) Visualize results
 
-> [!IMPORTANT]
-> You must have the [Kotlin Notebook](https://blog.jetbrains.com/kotlin/2023/07/introducing-kotlin-notebook/) plugin 
-> installed in IntelliJ IDEA Ultimate to view the results.
-
 To analyze the results:
 
 1. Open the [benchmarkResult.ipynb](benchmarkResult.ipynb) Kotlin Notebook file.
