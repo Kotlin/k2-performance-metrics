@@ -13,10 +13,6 @@ Three test scenarios are covered to benchmark the performance:
 
 After the build finishes, open the [benchmarkResult.ipynb](benchmarkResult.ipynb) Kotlin Notebook to compare the results.
 
-> [!IMPORTANT]
-> You must have the [Kotlin Notebook](https://blog.jetbrains.com/kotlin/2023/07/introducing-kotlin-notebook/) plugin 
-> installed in IntelliJ IDEA Ultimate to view the results.
-
 ## Prerequisites
 
 Ensure beforehand that the project that you want to analyze can be successfully compiled with both Kotlin versions that you want to compare.
@@ -124,10 +120,6 @@ To run performance tests, run the following command in your terminal:
 ```
 
 ## Step 4: (Optional) Visualize results
-
-> [!IMPORTANT]
-> You must have the [Kotlin Notebook](https://blog.jetbrains.com/kotlin/2023/07/introducing-kotlin-notebook/) plugin 
-> installed in IntelliJ IDEA Ultimate to view the results.
 
 To analyze the results:
 
